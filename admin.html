@@ -1,1 +1,39 @@
+<!-- admin.html -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Tomato Admin</title></head>
+<body>
+  <h1>Tomato 🍅 - Admin Panel</h1>
+  <p>To call APIs, set header <code>X-Admin-Id: 8193138896</code></p>
 
+  <h2>Withdrawals</h2>
+  <table border="1" id="wtbl">
+    <thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Method</th><th>Account</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function load(){
+      const res = await fetch('/api/withdrawals', {headers:{'X-Admin-Id':'8193138896'}});
+      const data = await res.json();
+      const tbody = document.querySelector('#wtbl tbody');
+      tbody.innerHTML = '';
+      data.forEach(w=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${w.id}</td><td>${w.user_id}</td><td>${w.amount}</td><td>${w.method}</td><td>${JSON.stringify(w.account_info)}</td><td>${w.status}</td>
+        <td><button onclick="approve(${w.id})">Approve</button> <button onclick="reject(${w.id})">Reject</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    async function approve(id){
+      await fetch(`/api/withdrawals/${id}/approve`, {method:'POST', headers:{'X-Admin-Id':'8193138896'}});
+      load();
+    }
+    async function reject(id){
+      await fetch(`/api/withdrawals/${id}/reject`, {method:'POST', headers:{'X-Admin-Id':'8193138896'}});
+      load();
+    }
+    load();
+  </script>
+</body>
+</html>
